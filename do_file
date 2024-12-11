@@ -1,0 +1,1042 @@
+use "systematic_review.dta"
+
+*FIGURE 1 - SUMMARY OF EFFECT OF WEIGHT LOSS INTERVENTIONS ON REPRODUCTIVE OUTCOMES
+
+cap drop logIRR 
+gen logIRR=log(RR)
+cap drop logcill logciul
+gen logcill=log(L95CI)
+gen logciul=log(U95CI)
+
+clonevar RRstr=RR
+clonevar LCIstr=L95CI
+clonevar UCIstr=U95CI
+
+tostring RRstr, replace force format(%9.2f)
+tostring LCIstr, replace force format(%9.2f)
+tostring UCIstr, replace force format(%9.2f)
+cap drop RR95CI
+cap drop s1 s2 s3
+gen s1=" ("
+gen s2=", "
+gen s3=")"
+gen RR95CI=RRstr+s1+LCIstr+s2+UCIstr+s3
+label var RR95CI "RR (95%CI)"
+
+label variable Outcome " "
+label variable RR "Risk Ratio (95% CI)"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+
+metan logIRR logcill logciul, nolog eform effect("Risk Ratio") xlabel (0.5 1 2.0, force) lcols (Outcome T_Events C_Events) texts(110) nobox nowt nohet nooverall scheme(s1color)		
+		
+
+*FIGURE 2A - TOTAL CLINICAL PREGNANCY
+
+label variable T_Clinical_Pregnancy "Events"
+label variable T_No_Clinical_Pregnancy "Failures"
+label variable C_Clinical_Pregnancy "Events"
+label variable C_No_Clinical_Pregnancy "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Clinical_Pregnancy C_Clinical_Pregnancy T_No_Clinical_Pregnancy C_No_Clinical_Pregnancy, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) sortby(MD) lcols(T_Events C_Events Age Baseline_BMI PCOS Type MD) forestplot(favours(Favors Comparator # Favors Intervention)) nobox scheme(s1color) clear
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE 2B - LIVE BIRTHS
+
+label variable T_Live_Birth "Events"
+label variable T_No_Live_Birth "Failures"
+label variable C_Live_Birth "Events"
+label variable C_No_Live_Birth "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Live_Birth C_Live_Birth T_No_Live_Birth C_No_Live_Birth, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) sortby(MD) lcols(T_Events C_Events Age Baseline_BMI PCOS Type MD) forestplot(favours(Favors Comparator # Favors Intervention)) nobox scheme(s1color) clear
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE 3A - TOTAL PREGNANCIES - META-REGRESSION
+
+label variable T_Clinical_Pregnancy "Events"
+label variable T_No_Clinical_Pregnancy "Failures"
+label variable C_Clinical_Pregnancy "Events"
+label variable C_No_Clinical_Pregnancy "Failures"
+label variable MD "Mean difference in weight change (kg)"
+
+meta esize T_Clinical_Pregnancy T_No_Clinical_Pregnancy C_Clinical_Pregnancy C_No_Clinical_Pregnancy, esize(lnrratio) studylabel (Study)
+meta summarize, random(sjonkman)
+meta regress MD, random(sjonkman) 
+estat bubbleplot, xscale(reverse) scheme(s1color)
+
+
+*FIGURE 3B - UNASSISTED PREGNANCIES - META-REGRESSION
+
+label variable T_Spontaneous_Pregnancy "Events"
+label variable T_No_Spontaneous_Pregnancy "Failures"
+label variable C_Spontaneous_Pregnancy "Events"
+label variable C_No_Spontaneous_Pregnancy "Failures"
+label variable MD "Mean difference in weight change (kg)"
+
+meta esize T_Spontaneous_Pregnancy T_No_Spontaneous_Pregnancy C_Spontaneous_Pregnancy C_No_Spontaneous_Pregnancy, esize(lnrratio) studylabel (Study)
+meta summarize, random(sjonkman)
+meta regress MD, random(sjonkman)
+estat bubbleplot, xscale(reverse) scheme(s1color)
+
+
+*FIGURE 3C - TREATMENT-INDUCED PREGNANCIES - META-REGRESSION
+
+label variable T_Assisted_Pregnancy "Events"
+label variable T_No_Assisted_Pregnancy "Failures"
+label variable C_Assisted_Pregnancy "Events"
+label variable C_No_Assisted_Pregnancy "Failures"
+label variable MD "Mean difference in weight change (kg)"
+
+meta esize T_Assisted_Pregnancy T_No_Assisted_Pregnancy C_Assisted_Pregnancy C_No_Assisted_Pregnancy, esize(lnrratio) studylabel (Study)
+meta summarize, random(sjonkman)
+meta regress MD, random(sjonkman)
+estat bubbleplot, xscale(reverse) scheme(s1color)
+
+
+*FIGURE 3D - LIVE BIRTHS - META-REGRESSION
+
+label variable T_Live_Birth "Events"
+label variable T_No_Live_Birth "Failures"
+label variable C_Live_Birth "Events"
+label variable C_No_Live_Birth "Failures"
+label variable MD "Mean difference in weight change (kg)"
+
+meta esize T_Live_Birth T_No_Live_Birth C_Live_Birth C_No_Live_Birth, esize(lnrratio) studylabel (Study)
+meta summarize, random(sjonkman)
+meta regress MD, random(sjonkman)
+estat bubbleplot, xscale(reverse) scheme(s1color)
+
+
+*FIGURE 3E - PREGNANCY LOSS - META-REGRESSION
+
+label variable T_Pregnancy_Loss "Events"
+label variable T_No_Pregnancy_Loss "Failures"
+label variable C_Pregnancy_Loss "Events"
+label variable C_No_Pregnancy_Loss "Failures"
+label variable MD "Mean difference in weight change (kg)"
+
+meta esize T_Pregnancy_Loss T_No_Pregnancy_Loss C_Pregnancy_Loss C_No_Pregnancy_Loss, esize(lnrratio) studylabel (Study)
+meta summarize, random(sjonkman)
+meta regress MD, random(sjonkman)
+estat bubbleplot, xscale(reverse) scheme(s1color)
+
+
+*FIGURE A2 - WEIGHT LOSS
+
+label variable n1 "Intervention (N)"
+label variable n2 "Comparator (N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+
+preserve
+metan MD SE, keepall label(namevar=Study) model (hksj) lcols (n1 n2 Age Baseline_BMI PCOS Type) nobox xlabel (-10 0 10) forestplot(favours(Favors Intervention # Favors Comparator)) effect (Mean difference in weight change, kg) scheme(s1color) clear
+
+label variable _LABELS "Study"
+label variable n1 "Intervention (N)"
+label variable n2 "Comparator (N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+forestplot, useopts
+restore 
+
+
+*FIGURE A3 - WEIGHT LOSS - SUBGROUP (intervention-comparator)
+
+label variable IntComp2 "Intervention & Comparator type"
+label define IntComp2_cat /*
+            */1 "Diet and/or physical activity vs no/minimal intervention" /*
+            */2 "Diet and/or physical activity vs active comparator" /*
+            */3 "Low-energy diet with some physical activity advice vs no/minimal intervention" /*
+            */4 "Low-energy diet with some physical activity advice vs active comparator" /*
+			*/5 "Pharmacotherapy with some diet and physical activity advice vs no/minimal intervention" /*
+			*/6 "Pharmacotherapy with some diet and physical activity advice vs active comparator"
+			label values IntComp2 IntComp2_cat
+label variable n1 "Intervention (N)"
+label variable n2 "Comparator (N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+
+preserve
+metan MD SE, keepall label(namevar=Study) model (hksj) lcols (n1 n2 Age Baseline_BMI PCOS) by(IntComp2) nobox xlabel (-10 0 10) forestplot(favours(Favors Intervention # Favors Comparator)) effect (Mean difference in weight change, kg) scheme(s1color) clear
+label variable _LABELS "Study"
+label variable n1 "Intervention (N)"
+label variable n2 "Comparator (N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+forestplot, useopts
+restore 
+
+
+*FIGURE A4 - WEIGHT LOSS - SORTED BY PCOS
+
+label variable n1 "Intervention (N)"
+label variable n2 "Comparator (N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+
+preserve
+metan MD SE, keepall label(namevar=Study) model (hksj) lcols (n1 n2 Age Baseline_BMI PCOS Type) sortby(PCOS) nobox xlabel (-10 0 10) forestplot(favours(Favors Intervention # Favors Comparator)) effect (Mean difference in weight change, kg) scheme(s1color) clear
+
+label variable _LABELS "Study"
+label variable n1 "Intervention (N)"
+label variable n2 "Comparator (N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+forestplot, useopts
+restore 
+
+
+*FIGURE A5 - TOTAL CLINICAL PREGNANCY - SUBGROUP (intervention-comparator)
+
+label variable IntComp2 "Intervention & Comparator type"
+label define IntComp2_cat /*
+            */1 "Diet and/or physical activity vs no/minimal intervention" /*
+            */2 "Diet and/or physical activity vs active comparator" /*
+            */3 "Low-energy diet with some physical activity advice vs no/minimal intervention" /*
+            */4 "Low-energy diet with some physical activity advice vs active comparator" /*
+			*/5 "Pharmacotherapy with some diet and physical activity advice vs no/minimal intervention" /*
+			*/6 "Pharmacotherapy with some diet and physical activity advice vs active comparator"
+			label values IntComp2 IntComp2_cat
+label variable T_Clinical_Pregnancy "Events"
+label variable T_No_Clinical_Pregnancy "Failures"
+label variable C_Clinical_Pregnancy "Events"
+label variable C_No_Clinical_Pregnancy "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Clinical_Pregnancy C_Clinical_Pregnancy T_No_Clinical_Pregnancy C_No_Clinical_Pregnancy, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) by (IntComp2) sortby(MD) lcols(T_Events C_Events Age Baseline_BMI PCOS MD) forestplot(favours(Favors Comparator # Favors Intervention)) nobox scheme(s1color) clear
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE A6 - TOTAL CLINICAL PREGNANCY - SORTED BY AGE
+
+label variable T_Clinical_Pregnancy "Events"
+label variable T_No_Clinical_Pregnancy "Failures"
+label variable C_Clinical_Pregnancy "Events"
+label variable C_No_Clinical_Pregnancy "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Clinical_Pregnancy C_Clinical_Pregnancy T_No_Clinical_Pregnancy C_No_Clinical_Pregnancy, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) sortby(Age) lcols(T_Events C_Events Age Baseline_BMI PCOS Type MD) forestplot(favours(Favors Comparator # Favors Intervention)) nobox scheme(s1color) clear
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE A7 - TOTAL CLINICAL PREGNANCY - SORTED BY BMI
+
+label variable T_Clinical_Pregnancy "Events"
+label variable T_No_Clinical_Pregnancy "Failures"
+label variable C_Clinical_Pregnancy "Events"
+label variable C_No_Clinical_Pregnancy "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Clinical_Pregnancy C_Clinical_Pregnancy T_No_Clinical_Pregnancy C_No_Clinical_Pregnancy, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) sortby(Baseline_BMI) lcols(T_Events C_Events Age Baseline_BMI PCOS Type MD) forestplot(favours(Favors Comparator # Favors Intervention)) nobox scheme(s1color) clear
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE A8 - TOTAL CLINICAL PREGNANCY - SORTED BY PCOS
+
+label variable T_Clinical_Pregnancy "Events"
+label variable T_No_Clinical_Pregnancy "Failures"
+label variable C_Clinical_Pregnancy "Events"
+label variable C_No_Clinical_Pregnancy "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Clinical_Pregnancy C_Clinical_Pregnancy T_No_Clinical_Pregnancy C_No_Clinical_Pregnancy, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) sortby(PCOS) lcols(T_Events C_Events Age Baseline_BMI PCOS Type MD) forestplot(favours(Favors Comparator # Favors Intervention)) nobox scheme(s1color) clear
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE A9 - LIVE BIRTHS - SUBGROUP (intervention-comparator)
+
+label variable IntComp2 "Intervention & Comparator type"
+label define IntComp2_cat /*
+            */1 "Diet and/or physical activity vs no/minimal intervention" /*
+            */2 "Diet and/or physical activity vs active comparator" /*
+            */3 "Low-energy diet with some physical activity advice vs no/minimal intervention" /*
+            */4 "Low-energy diet with some physical activity advice vs active comparator" /*
+			*/5 "Pharmacotherapy with some diet and physical activity advice vs no/minimal intervention" /*
+			*/6 "Pharmacotherapy with some diet and physical activity advice vs active comparator"
+			label values IntComp2 IntComp2_cat
+label variable T_Live_Birth "Events"
+label variable T_No_Live_Birth "Failures"
+label variable C_Live_Birth "Events"
+label variable C_No_Live_Birth "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Live_Birth C_Live_Birth T_No_Live_Birth C_No_Live_Birth, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) by (IntComp2) sortby(MD) lcols(T_Events C_Events Age Baseline_BMI PCOS MD) forestplot(favours(Favors Comparator # Favors Intervention)) nobox scheme(s1color) clear
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE A10 - LIVE BIRTHS - SORTED BY AGE
+
+label variable T_Live_Birth "Events"
+label variable T_No_Live_Birth "Failures"
+label variable C_Live_Birth "Events"
+label variable C_No_Live_Birth "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Live_Birth C_Live_Birth T_No_Live_Birth C_No_Live_Birth, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) sortby(Age) lcols(T_Events C_Events Age Baseline_BMI PCOS Type MD) forestplot(favours(Favors Comparator # Favors Intervention)) nobox scheme(s1color) clear
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE A11 - LIVE BIRTHS - SORTED BY BMI
+
+label variable T_Live_Birth "Events"
+label variable T_No_Live_Birth "Failures"
+label variable C_Live_Birth "Events"
+label variable C_No_Live_Birth "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Live_Birth C_Live_Birth T_No_Live_Birth C_No_Live_Birth, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) sortby(Baseline_BMI) lcols(T_Events C_Events Age Baseline_BMI PCOS Type MD) forestplot(favours(Favors Comparator # Favors Intervention)) nobox scheme(s1color) clear
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE A12 - LIVE BIRTHS - SORTED BY PCOS
+
+label variable T_Live_Birth "Events"
+label variable T_No_Live_Birth "Failures"
+label variable C_Live_Birth "Events"
+label variable C_No_Live_Birth "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Live_Birth C_Live_Birth T_No_Live_Birth C_No_Live_Birth, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) sortby(PCOS) lcols(T_Events C_Events Age Baseline_BMI PCOS Type MD) forestplot(favours(Favors Comparator # Favors Intervention)) nobox scheme(s1color) clear
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE A13 - UNASSISTED PREGNANCY
+
+label variable T_Spontaneous_Pregnancy "Events"
+label variable T_No_Spontaneous_Pregnancy "Failures"
+label variable C_Spontaneous_Pregnancy "Events"
+label variable C_No_Spontaneous_Pregnancy "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Spontaneous_Pregnancy C_Spontaneous_Pregnancy T_No_Spontaneous_Pregnancy C_No_Spontaneous_Pregnancy, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) sortby(MD) lcols(T_Events C_Events Age Baseline_BMI PCOS Type MD) forestplot(favours(Favors Comparator # Favors Intervention)) nobox scheme(s1color) clear
+
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE A14 - UNASSISTED PREGNANCY - SUBGROUP (intervention-comparator)
+
+label variable IntComp2 "Intervention & Comparator type"
+label define IntComp2_cat /*
+            */1 "Diet and/or physical activity vs no/minimal intervention" /*
+            */2 "Diet and/or physical activity vs active comparator" /*
+            */3 "Low-energy diet with some physical activity advice vs no/minimal intervention" /*
+            */4 "Low-energy diet with some physical activity advice vs active comparator" /*
+			*/5 "Pharmacotherapy with some diet and physical activity advice vs no/minimal intervention" /*
+			*/6 "Pharmacotherapy with some diet and physical activity advice vs active comparator"
+			label values IntComp2 IntComp2_cat
+label variable T_Spontaneous_Pregnancy "Events"
+label variable T_No_Spontaneous_Pregnancy "Failures"
+label variable C_Spontaneous_Pregnancy "Events"
+label variable C_No_Spontaneous_Pregnancy "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Spontaneous_Pregnancy C_Spontaneous_Pregnancy T_No_Spontaneous_Pregnancy C_No_Spontaneous_Pregnancy, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) by (IntComp2) sortby(MD) lcols(T_Events C_Events Age Baseline_BMI PCOS MD) forestplot(favours(Favors Comparator # Favors Intervention)) nobox scheme(s1color) clear
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE A15 - UNASSISTED PREGNANCY - SORTED BY AGE
+
+label variable T_Spontaneous_Pregnancy "Events"
+label variable T_No_Spontaneous_Pregnancy "Failures"
+label variable C_Spontaneous_Pregnancy "Events"
+label variable C_No_Spontaneous_Pregnancy "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Spontaneous_Pregnancy C_Spontaneous_Pregnancy T_No_Spontaneous_Pregnancy C_No_Spontaneous_Pregnancy, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) sortby(Age) lcols(T_Events C_Events Age Baseline_BMI PCOS Type MD) forestplot(favours(Favors Comparator # Favors Intervention)) nobox scheme(s1color) clear
+
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE A16 - UNASSISTED PREGNANCY - SORTED BY BMI
+
+label variable T_Spontaneous_Pregnancy "Events"
+label variable T_No_Spontaneous_Pregnancy "Failures"
+label variable C_Spontaneous_Pregnancy "Events"
+label variable C_No_Spontaneous_Pregnancy "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Spontaneous_Pregnancy C_Spontaneous_Pregnancy T_No_Spontaneous_Pregnancy C_No_Spontaneous_Pregnancy, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) sortby(Baseline_BMI) lcols(T_Events C_Events Age Baseline_BMI PCOS Type MD) forestplot(favours(Favors Comparator # Favors Intervention)) nobox scheme(s1color) clear
+
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE A17 - UNASSISTED PREGNANCY - SORTED BY PCOS
+
+label variable T_Spontaneous_Pregnancy "Events"
+label variable T_No_Spontaneous_Pregnancy "Failures"
+label variable C_Spontaneous_Pregnancy "Events"
+label variable C_No_Spontaneous_Pregnancy "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Spontaneous_Pregnancy C_Spontaneous_Pregnancy T_No_Spontaneous_Pregnancy C_No_Spontaneous_Pregnancy, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) sortby(PCOS) lcols(T_Events C_Events Age Baseline_BMI PCOS Type MD) forestplot(favours(Favors Comparator # Favors Intervention)) nobox scheme(s1color) clear
+
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE A18 - TREATMENT-INDUCED PREGNANCY
+
+label variable T_Assisted_Pregnancy "Events"
+label variable T_No_Assisted_Pregnancy "Failures"
+label variable C_Assisted_Pregnancy "Events"
+label variable C_No_Assisted_Pregnancy "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Assisted_Pregnancy C_Assisted_Pregnancy T_No_Assisted_Pregnancy C_No_Assisted_Pregnancy, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) sortby(MD) lcols(T_Events C_Events Age Baseline_BMI PCOS Type MD) forestplot(favours(Favors Comparator # Favors Intervention)) nobox scheme(s1color) clear
+
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE A19 - TREATMENT-INDUCED PREGNANCY - SUBGROUP (intervention-comparator)
+
+label variable IntComp2 "Intervention & Comparator type"
+label define IntComp2_cat /*
+            */1 "Diet and/or physical activity vs no/minimal intervention" /*
+            */2 "Diet and/or physical activity vs active comparator" /*
+            */3 "Low-energy diet with some physical activity advice vs no/minimal intervention" /*
+            */4 "Low-energy diet with some physical activity advice vs active comparator" /*
+			*/5 "Pharmacotherapy with some diet and physical activity advice vs no/minimal intervention" /*
+			*/6 "Pharmacotherapy with some diet and physical activity advice vs active comparator"
+			label values IntComp2 IntComp2_cat
+label variable T_Assisted_Pregnancy "Events"
+label variable T_No_Assisted_Pregnancy "Failures"
+label variable C_Assisted_Pregnancy "Events"
+label variable C_No_Assisted_Pregnancy "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Assisted_Pregnancy C_Assisted_Pregnancy T_No_Assisted_Pregnancy C_No_Assisted_Pregnancy, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) by (IntComp2) sortby(MD) lcols(T_Events C_Events Age Baseline_BMI PCOS MD) forestplot(favours(Favors Comparator # Favors Intervention)) nobox scheme(s1color) clear
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE A20 - TREATMENT-INDUCED PREGNANCY - SORTED BY AGE
+
+label variable T_Assisted_Pregnancy "Events"
+label variable T_No_Assisted_Pregnancy "Failures"
+label variable C_Assisted_Pregnancy "Events"
+label variable C_No_Assisted_Pregnancy "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Assisted_Pregnancy C_Assisted_Pregnancy T_No_Assisted_Pregnancy C_No_Assisted_Pregnancy, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) sortby(Age) lcols(T_Events C_Events Age Baseline_BMI PCOS Type MD) forestplot(favours(Favors Comparator # Favors Intervention)) nobox scheme(s1color) clear
+
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE A21 - TREATMENT-INDUCED PREGNANCY - SORTED BY BMI
+
+label variable T_Assisted_Pregnancy "Events"
+label variable T_No_Assisted_Pregnancy "Failures"
+label variable C_Assisted_Pregnancy "Events"
+label variable C_No_Assisted_Pregnancy "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Assisted_Pregnancy C_Assisted_Pregnancy T_No_Assisted_Pregnancy C_No_Assisted_Pregnancy, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) sortby(Baseline_BMI) lcols(T_Events C_Events Age Baseline_BMI PCOS Type MD) forestplot(favours(Favors Comparator # Favors Intervention)) nobox scheme(s1color) clear
+
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE A22 - TREATMENT-INDUCED PREGNANCY - SORTED BY PCOS
+
+label variable T_Assisted_Pregnancy "Events"
+label variable T_No_Assisted_Pregnancy "Failures"
+label variable C_Assisted_Pregnancy "Events"
+label variable C_No_Assisted_Pregnancy "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Assisted_Pregnancy C_Assisted_Pregnancy T_No_Assisted_Pregnancy C_No_Assisted_Pregnancy, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) sortby(PCOS) lcols(T_Events C_Events Age Baseline_BMI PCOS Type MD) forestplot(favours(Favors Comparator # Favors Intervention)) nobox scheme(s1color) clear
+
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE A23 - PREGNANCY LOSS
+
+label variable T_Pregnancy_Loss "Events"
+label variable T_No_Pregnancy_Loss "Failures"
+label variable C_Pregnancy_Loss "Events"
+label variable C_No_Pregnancy_Loss "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Pregnancy_Loss C_Pregnancy_Loss T_No_Pregnancy_Loss C_No_Pregnancy_Loss, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) sortby(MD) lcols(T_Events C_Events Age Baseline_BMI PCOS Type MD) forestplot(favours(Favors Intervention # Favors Comparator)) nobox scheme(s1color) clear
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE A24 - PREGNANCY LOSS - SUBGROUP (intervention-comparator)
+
+label variable IntComp2 "Intervention & Comparator type"
+label define IntComp2_cat /*
+            */1 "Diet and/or physical activity vs no/minimal intervention" /*
+            */2 "Diet and/or physical activity vs active comparator" /*
+            */3 "Low-energy diet with some physical activity advice vs no/minimal intervention" /*
+            */4 "Low-energy diet with some physical activity advice vs active comparator" /*
+			*/5 "Pharmacotherapy with some diet and physical activity advice vs no/minimal intervention" /*
+			*/6 "Pharmacotherapy with some diet and physical activity advice vs active comparator"
+			label values IntComp2 IntComp2_cat
+label variable T_Pregnancy_Loss "Events"
+label variable T_No_Pregnancy_Loss "Failures"
+label variable C_Pregnancy_Loss "Events"
+label variable C_No_Pregnancy_Loss "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Pregnancy_Loss C_Pregnancy_Loss T_No_Pregnancy_Loss C_No_Pregnancy_Loss, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) by (IntComp2) sortby(MD) lcols(T_Events C_Events Age Baseline_BMI PCOS MD) forestplot(favours(Favors Intervention # Favors Comparator)) nobox scheme(s1color) clear
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE A25 - PREGNANCY LOSS - SORTED BY AGE
+
+label variable T_Pregnancy_Loss "Events"
+label variable T_No_Pregnancy_Loss "Failures"
+label variable C_Pregnancy_Loss "Events"
+label variable C_No_Pregnancy_Loss "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Pregnancy_Loss C_Pregnancy_Loss T_No_Pregnancy_Loss C_No_Pregnancy_Loss, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) sortby(Age) lcols(T_Events C_Events Age Baseline_BMI PCOS Type MD) forestplot(favours(Favors Intervention # Favors Comparator)) nobox scheme(s1color) clear
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE A26 - PREGNANCY LOSS - SORTED BY BMI
+
+label variable T_Pregnancy_Loss "Events"
+label variable T_No_Pregnancy_Loss "Failures"
+label variable C_Pregnancy_Loss "Events"
+label variable C_No_Pregnancy_Loss "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Pregnancy_Loss C_Pregnancy_Loss T_No_Pregnancy_Loss C_No_Pregnancy_Loss, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) sortby(Baseline_BMI) lcols(T_Events C_Events Age Baseline_BMI PCOS Type MD) forestplot(favours(Favors Intervention # Favors Comparator)) nobox scheme(s1color) clear
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE A27 - PREGNANCY LOSS - SORTED BY PCOS
+
+label variable T_Pregnancy_Loss "Events"
+label variable T_No_Pregnancy_Loss "Failures"
+label variable C_Pregnancy_Loss "Events"
+label variable C_No_Pregnancy_Loss "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Pregnancy_Loss C_Pregnancy_Loss T_No_Pregnancy_Loss C_No_Pregnancy_Loss, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) sortby(PCOS) lcols(T_Events C_Events Age Baseline_BMI PCOS Type MD) forestplot(favours(Favors Intervention # Favors Comparator)) nobox scheme(s1color) clear
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*Code for Figures A28-A33 is the same for each reproductive outcome as above
+
+ 
+*FIGURE A34 - TREATMENT-INDUCED PREGNANCY - SENSITIVITY (n cycles)
+
+label variable T_Assisted_Pregnancy "Events"
+label variable T_No_Assisted_Pregnancy "Failures"
+label variable C_Assisted_Pregnancy "Events"
+label variable C_No_Assisted_Pregnancy "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Assisted_Pregnancy C_Assisted_Pregnancy T_No_Assisted_Pregnancy C_No_Assisted_Pregnancy, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) sortby(MD) lcols(T_Events C_Events Age Baseline_BMI PCOS Type MD) forestplot(favours(Favors Comparator # Favors Intervention)) nobox scheme(s1color) clear
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE A35 - LIVE BIRTHS - SENSITIVITY (n cycles)
+
+label variable T_Live_Birth "Events"
+label variable T_No_Live_Birth "Failures"
+label variable C_Live_Birth "Events"
+label variable C_No_Live_Birth "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Live_Birth C_Live_Birth T_No_Live_Birth C_No_Live_Birth, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) sortby(MD) lcols(T_Events C_Events Age Baseline_BMI PCOS Type MD) forestplot(favours(Favors Comparator # Favors Intervention)) nobox scheme(s1color) clear
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE A36 - PREGNANCY LOSS - SENSITIVITY (n cycles)
+
+label variable T_Pregnancy_Loss "Events"
+label variable T_No_Pregnancy_Loss "Failures"
+label variable C_Pregnancy_Loss "Events"
+label variable C_No_Pregnancy_Loss "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+
+preserve
+metan T_Pregnancy_Loss C_Pregnancy_Loss T_No_Pregnancy_Loss C_No_Pregnancy_Loss, keepall label(namevar=Study) rr model (dl,hksj\mh) xlabel(0.1 1.0 10.0, force) sortby(MD) lcols(T_Events C_Events Age Baseline_BMI PCOS Type MD) forestplot(favours(Favors Intervention # Favors Comparator)) nobox scheme(s1color) clear
+label variable _LABELS "Study"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+label variable Age "Mean age (years)"
+label variable Baseline_BMI "Baseline BMI (kg/m2)"
+label variable PCOS "% PCOS"
+label variable Type "Intervention type"
+label variable MD "Mean difference in weight change (kg)"
+forestplot, useopts
+restore 
+
+
+*FIGURE S3A - FUNNEL PLOT - TOTAL CLINICAL PREGNANCY
+
+label variable T_Clinical_Pregnancy "Events"
+label variable T_No_Clinical_Pregnancy "Failures"
+label variable C_Clinical_Pregnancy "Events"
+label variable C_No_Clinical_Pregnancy "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+
+meta esize T_Clinical_Pregnancy T_No_Clinical_Pregnancy C_Clinical_Pregnancy C_No_Clinical_Pregnancy, esize(lnrratio) studylabel (Study)
+
+meta summarize, random(sjonkman)
+
+meta forestplot _id T_Clinical_Pregnancy T_Total C_Clinical_Pregnancy C_Total _plot _esci _weight, random(sjonkman) nullrefline(favorsleft("Favors Control") favorsright("Favors Intervention")) crop (0.1 10) columnopts(T_Clinical_Pregnancy, supertitle(Intervention)) columnopts(C_Clinical_Pregnancy, supertitle(Control)) rr 
+
+meta funnelplot
+
+
+*FIGURE S3B - FUNNEL PLOT - LIVE BIRTH
+
+label variable T_Live_Birth "Events"
+label variable T_Live_Birth "Failures"
+label variable C_Live_Birth "Events"
+label variable C_Live_Birth "Failures"
+label variable T_Events "Intervention (n / N)"
+label variable C_Events "Comparator (n / N)"
+
+meta esize T_Live_Birth T_No_Live_Birth C_Live_Birth C_No_Live_Birth, esize(lnrratio) studylabel (Study)
+
+meta summarize, random(sjonkman)
+
+meta forestplot _id T_Live_Birth T_Total C_Live_Birth C_Total _plot _esci _weight, random(sjonkman) nullrefline(favorsleft("Favors Control") favorsright("Favors Intervention")) crop (0.1 10) columnopts(T_Live_Birth, supertitle(Intervention)) columnopts(C_Live_Birth, supertitle(Control)) rr 
+
+meta funnelplot
